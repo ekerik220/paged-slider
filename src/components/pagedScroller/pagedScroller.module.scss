@@ -1,0 +1,43 @@
+.visibleArea {
+  position: relative;
+  border: 1px solid black;
+  width: 500px;
+  // height: 100px;
+  overflow: hidden;
+}
+
+.itemsContainer {
+  display: flex;
+  // height: 100px;
+  overflow-x: auto;
+  column-gap: 10px;
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+.itemsContainer::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.scrollButton {
+  border-radius: 100%;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+}
+
+.leftScrollButton {
+  @extend .scrollButton;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.rightScrollButton {
+  @extend .scrollButton;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
