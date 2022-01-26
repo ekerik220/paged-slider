@@ -1,11 +1,9 @@
 import {
-  faAngleDoubleLeft,
-  faAngleLeft,
-  faAngleRight,
-  IconDefinition,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { FC, useMemo } from "react";
+  HiChevronDoubleLeft,
+  HiChevronLeft,
+  HiChevronRight,
+} from "react-icons/hi";
+import React, { cloneElement, FC, ReactElement, useMemo } from "react";
 import { css, styled } from "@stitches/react";
 
 type Props = {
@@ -16,7 +14,7 @@ type Props = {
 
 type ButtonMetaData = {
   overrideStyle: string;
-  icon: IconDefinition;
+  icon: ReactElement;
   ariaLabel: string;
 };
 
@@ -26,19 +24,19 @@ export const Button: FC<Props> = ({ type, override, onClick }) => {
       case "left":
         return {
           overrideStyle: overrideButtonStyle({ side: "left" }),
-          icon: faAngleLeft,
+          icon: <HiChevronLeft />,
           ariaLabel: "scroll left",
         };
       case "right":
         return {
           overrideStyle: overrideButtonStyle({ side: "right" }),
-          icon: faAngleRight,
+          icon: <HiChevronRight />,
           ariaLabel: "scroll right",
         };
       case "returnToStart":
         return {
           overrideStyle: overrideButtonStyle({ side: "right" }),
-          icon: faAngleDoubleLeft,
+          icon: <HiChevronDoubleLeft />,
           ariaLabel: "scroll to start",
         };
     }
@@ -53,7 +51,7 @@ export const Button: FC<Props> = ({ type, override, onClick }) => {
 
   return (
     <ScrollButton type={type} aria-label={ariaLabel} onClick={onClick}>
-      <FontAwesomeIcon icon={icon} color="white" />
+      {cloneElement(icon, { color: "white" })}
     </ScrollButton>
   );
 };
@@ -92,6 +90,11 @@ const ScrollButton = styled("button", {
   fontSize: 30,
   backgroundColor: "rgba(0, 0, 0, 0.2)",
   cursor: "pointer",
+  transition: "opacity 0.2s",
+
+  "&:hover": {
+    opacity: 0.6,
+  },
 
   variants: {
     type: {

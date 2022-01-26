@@ -1,1 +1,1 @@
-export * from "./components/button/button";
+export { PagedScroller } from "src/lib/components/pagedScroller/pagedScroller";
