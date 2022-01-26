@@ -1,3 +1,6 @@
+![example](https://user-images.githubusercontent.com/5779535/151152606-5f4f7e64-e9db-491d-af25-bb393df50d26.gif)
+
+
 # paged-scroller
 
 A horizontal psuedo-scrolling (no scroll bar) box component. Scroll arrows can be optionally displayed, and clicking on them scrolls over one page (making sure that no items are skipped). It also optionally supports drag gestures that play nice with items that have onClick handlers.
