@@ -1,5 +1,6 @@
-import { useRef } from "react";
-import { useSpring } from "@react-spring/web";
+import useSize from "@react-hook/size";
+import { useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 type Position = {
   width: number;
@@ -12,10 +13,32 @@ export const usePagedScroller = () => {
   const visibleContainerRef = useRef<HTMLDivElement>(null);
   const itemsContainerRef = useRef<HTMLDivElement>(null);
   const positionList = useRef<Position[]>([]);
+  const scrollLock = useRef(false);
 
-  const [{ itemsContainerOffset }, spring] = useSpring(() => ({
-    itemsContainerOffset: 0,
-  }));
+  const [visibleContainerWidth] = useSize(visibleContainerRef);
+  const [itemsContainerWidth] = useSize(itemsContainerRef);
+
+  const springDuration = 500;
+  const xSpring = useSpring(0, { duration: springDuration });
+  const x = useMotionValue(0);
+
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+
+  useEffect(() => {
+    const unsubscribeSpring = xSpring.onChange(() => x.set(xSpring.get()));
+    const unsubscribeX = x.onChange(() => {
+      xSpring.set(x.get(), false);
+      setAtStart(x.get() >= 0);
+      setAtEnd(
+        Math.abs(x.get()) >= itemsContainerWidth - visibleContainerWidth
+      );
+    });
+    return () => {
+      unsubscribeSpring();
+      unsubscribeX();
+    };
+  }, [xSpring, x, itemsContainerWidth, visibleContainerWidth]);
 
   const updatePositionList = (
     index: number,
@@ -27,12 +50,22 @@ export const usePagedScroller = () => {
     positionList.current[index] = { width, height, x, y };
   };
 
+  const setScrollLock = () => {
+    scrollLock.current = true;
+    // Let go of the lock 100ms before animation finishes so user doesn't
+    // have to wait for the scroll to completely stop
+    setTimeout(() => (scrollLock.current = false), springDuration - 100);
+  };
+
   const onLeftButtonClick = () => {
+    if (scrollLock.current) return;
+    setScrollLock();
+
     // If there is an item partially visible on the left side, get it's index
     const straddledPositionIndex = positionList.current.findIndex(
       (item) =>
-        -itemsContainerOffset > item.x &&
-        -itemsContainerOffset < item.x + item.width
+        Math.abs(xSpring.get()) > item.x &&
+        Math.abs(xSpring.get()) < item.x + item.width
     );
 
     // If there was no staddled item, get the index of the item that comes before
@@ -43,7 +76,7 @@ export const usePagedScroller = () => {
     let visibleAfterScrollIndex = straddledPositionIndex;
     if (straddledPositionIndex === -1) {
       const firstVisibleItemIndex = positionList.current.findIndex(
-        (item) => item.x >= Math.abs(itemsContainerOffset.get())
+        (item) => item.x >= Math.abs(xSpring.get())
       );
       visibleAfterScrollIndex = Math.max(0, firstVisibleItemIndex - 1);
     }
@@ -64,27 +97,21 @@ export const usePagedScroller = () => {
           positionList.current[i].x
       );
 
-      const visibleContainerWidth =
-        visibleContainerRef.current?.clientWidth ?? 0;
-
       if (positionDiff <= visibleContainerWidth) {
         newPositionIndex = i;
       } else break;
     }
-
-    console.log(positionList.current[newPositionIndex].x);
-
-    spring.start({
-      itemsContainerOffset: positionList.current[newPositionIndex].x,
-    });
+    x.stop();
+    xSpring.set(-positionList.current[newPositionIndex].x);
   };
 
   const onRightButtonClick = () => {
+    if (scrollLock.current) return;
+    setScrollLock();
+
     // Start by getting a naive after-scroll position by just moving the offset
     // over by the width of the visible box.
-    const visibleContainerWidth = visibleContainerRef.current?.clientWidth ?? 0;
-    let proposedNewOffset = itemsContainerOffset.get() + visibleContainerWidth;
-    console.log(proposedNewOffset);
+    let proposedNewOffset = -xSpring.get() + visibleContainerWidth;
 
     // If the naive after-scroll position caused us to be straddling an item on the left side
     // of the visible box, it means we've not fully seen this item yet and need to adjust backwards
@@ -93,28 +120,37 @@ export const usePagedScroller = () => {
       (item) =>
         proposedNewOffset >= item.x && proposedNewOffset < item.x + item.width
     );
+
     if (straddledPosition) {
       proposedNewOffset = straddledPosition.x;
     }
 
     // Prevent scrolling past the last item
-    const itemsContainerWidth = itemsContainerRef.current?.scrollWidth ?? 0;
     proposedNewOffset = Math.min(
       itemsContainerWidth - visibleContainerWidth,
       proposedNewOffset
     );
-    spring.start({
-      itemsContainerOffset: proposedNewOffset,
-    });
+    x.stop();
+    xSpring.set(-proposedNewOffset);
+  };
+
+  const onReturnToStartButtonClick = () => {
+    if (scrollLock.current) return;
+    setScrollLock();
+    xSpring.set(0);
   };
 
   return {
-    // bind,
-    itemsContainerOffset,
+    x,
     itemsContainerRef,
+    itemsContainerWidth,
     visibleContainerRef,
+    visibleContainerWidth,
+    atStart,
+    atEnd,
     updatePositionList,
     onLeftButtonClick,
     onRightButtonClick,
+    onReturnToStartButtonClick,
   };
 };

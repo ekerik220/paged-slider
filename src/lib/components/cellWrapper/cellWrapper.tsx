@@ -2,6 +2,7 @@ import useSize from "@react-hook/size";
 import { FC, useEffect, useRef } from "react";
 
 type Props = {
+  preventTaps: boolean;
   updatePositionList: (
     width: number,
     height: number,
@@ -10,7 +11,11 @@ type Props = {
   ) => void;
 };
 
-export const CellWrapper: FC<Props> = ({ updatePositionList, children }) => {
+export const CellWrapper: FC<Props> = ({
+  preventTaps,
+  updatePositionList,
+  children,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, height] = useSize(containerRef);
 
@@ -20,5 +25,12 @@ export const CellWrapper: FC<Props> = ({ updatePositionList, children }) => {
     updatePositionList(width, height, x, y);
   }, [updatePositionList, width, height]);
 
-  return <div ref={containerRef}>{children}</div>;
+  return (
+    <div
+      ref={containerRef}
+      style={{ pointerEvents: preventTaps ? "none" : undefined }}
+    >
+      {children}
+    </div>
+  );
 };

@@ -1,0 +1,103 @@
+import {
+  faAngleDoubleLeft,
+  faAngleLeft,
+  faAngleRight,
+  IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { FC, useMemo } from "react";
+import { css, styled } from "@stitches/react";
+
+type Props = {
+  type: "left" | "right" | "returnToStart";
+  override?: React.ReactElement;
+  onClick: () => void;
+};
+
+type ButtonMetaData = {
+  overrideStyle: string;
+  icon: IconDefinition;
+  ariaLabel: string;
+};
+
+export const Button: FC<Props> = ({ type, override, onClick }) => {
+  const { overrideStyle, icon, ariaLabel } = useMemo<ButtonMetaData>(() => {
+    switch (type) {
+      case "left":
+        return {
+          overrideStyle: overrideButtonStyle({ side: "left" }),
+          icon: faAngleLeft,
+          ariaLabel: "scroll left",
+        };
+      case "right":
+        return {
+          overrideStyle: overrideButtonStyle({ side: "right" }),
+          icon: faAngleRight,
+          ariaLabel: "scroll right",
+        };
+      case "returnToStart":
+        return {
+          overrideStyle: overrideButtonStyle({ side: "right" }),
+          icon: faAngleDoubleLeft,
+          ariaLabel: "scroll to start",
+        };
+    }
+  }, [type]);
+
+  if (override)
+    return React.cloneElement(override, {
+      className: overrideStyle,
+      ariaLabel,
+      onClick,
+    });
+
+  return (
+    <ScrollButton type={type} aria-label={ariaLabel} onClick={onClick}>
+      <FontAwesomeIcon icon={icon} color="white" />
+    </ScrollButton>
+  );
+};
+
+const positioned = {
+  position: "absolute",
+  top: "50%",
+  transform: "translate(0, -50%)",
+};
+const leftPositioned = {
+  ...positioned,
+  left: 10,
+};
+const rightPositioned = {
+  ...positioned,
+  right: 10,
+};
+
+const overrideButtonStyle = css({
+  variants: {
+    side: {
+      left: leftPositioned,
+      right: rightPositioned,
+    },
+  },
+});
+
+const ScrollButton = styled("button", {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  borderRadius: "100%",
+  border: "1px solid hsla(0, 0%, 100%, 0.7)",
+  width: 40,
+  height: 40,
+  fontSize: 30,
+  backgroundColor: "rgba(0, 0, 0, 0.2)",
+  cursor: "pointer",
+
+  variants: {
+    type: {
+      left: leftPositioned,
+      right: rightPositioned,
+      returnToStart: rightPositioned,
+    },
+  },
+});
