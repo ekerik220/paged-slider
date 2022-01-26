@@ -1,4 +1,5 @@
 import useSize from "@react-hook/size";
+import React from "react";
 import { FC, useEffect, useRef } from "react";
 
 type Props = {

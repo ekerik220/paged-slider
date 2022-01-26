@@ -1,9 +1,9 @@
 import React, { Children, FC, useState } from "react";
 import { usePagedScroller } from "./usePagedScroller";
-import { m, LazyMotion } from "framer-motion";
-import { CellWrapper } from "src/lib/components/cellWrapper/cellWrapper";
-import { Button } from "src/lib/components/button/button";
-import { isTouchDevice } from "src/lib/utils/isTouchDevice";
+import { motion } from "framer-motion";
+import { CellWrapper } from "../cellWrapper/cellWrapper";
+import { Button } from "../button/button";
+import { isTouchDevice } from "../../utils/isTouchDevice";
 import { styled } from "@stitches/react";
 
 type Props = {
@@ -52,42 +52,37 @@ export const PagedScroller: FC<Props> = ({
 
   const [dragging, setDragging] = useState(false);
 
-  const loadLazyMotionFeatures = () =>
-    import("src/lib/utils/lazyMotion").then((res) => res.default);
-
   return (
     <VisibleContainer
       ref={visibleContainerRef}
       css={{ width, maxWidth: itemsContainerWidth }}
     >
       <>
-        <LazyMotion features={loadLazyMotionFeatures}>
-          <ItemsContainer
-            ref={itemsContainerRef}
-            css={{ columnGap: itemGap }}
-            drag={enableDrag ? "x" : false}
-            dragConstraints={{
-              left: -itemsContainerWidth + visibleContainerWidth,
-              right: 0,
-            }}
-            _dragX={x}
-            style={{ x }}
-            dragElastic={!dragElastic ? false : undefined}
-            onDragStart={() => setDragging(true)}
-            onDragEnd={() => setDragging(false)}
-          >
-            {Children.map(children, (child, index) => (
-              <CellWrapper
-                preventTaps={dragging}
-                updatePositionList={(width, height, x, y) =>
-                  updatePositionList(index, width, height, x, y)
-                }
-              >
-                {child}
-              </CellWrapper>
-            ))}
-          </ItemsContainer>
-        </LazyMotion>
+        <ItemsContainer
+          ref={itemsContainerRef}
+          css={{ columnGap: itemGap }}
+          drag={enableDrag ? "x" : false}
+          dragConstraints={{
+            left: -itemsContainerWidth + visibleContainerWidth,
+            right: 0,
+          }}
+          _dragX={x}
+          style={{ x }}
+          dragElastic={!dragElastic ? false : undefined}
+          onDragStart={() => setDragging(true)}
+          onDragEnd={() => setDragging(false)}
+        >
+          {Children.map(children, (child, index) => (
+            <CellWrapper
+              preventTaps={dragging}
+              updatePositionList={(width, height, x, y) =>
+                updatePositionList(index, width, height, x, y)
+              }
+            >
+              {child}
+            </CellWrapper>
+          ))}
+        </ItemsContainer>
       </>
       {showArrows && visibleContainerWidth !== itemsContainerWidth && (
         <>
@@ -122,6 +117,6 @@ const VisibleContainer = styled("div", {
   overflow: "hidden",
 });
 
-const ItemsContainer = styled(m.div, {
+const ItemsContainer = styled(motion.div, {
   display: "inline-flex",
 });
