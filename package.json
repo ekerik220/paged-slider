@@ -4,6 +4,9 @@
   "description": "A horizontal psuedo-scrolling (no scroll bar) box component.",
   "author": "Evan Kerik",
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "@react-hook/size": "^2.1.2",
