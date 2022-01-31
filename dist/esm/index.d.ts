@@ -1,4 +1,5 @@
-import React, { FC } from "react";
+import React, { FC } from 'react';
+
 declare type Props = {
     width?: string;
     itemGap?: number;
@@ -8,5 +9,6 @@ declare type Props = {
     scrollRightButton?: React.ReactElement;
     returnToStartButton?: React.ReactElement;
 };
-export declare const PagedScroller: FC<Props>;
-export {};
+declare const PagedScroller: FC<Props>;
+
+export { PagedScroller };

@@ -1,10 +1,9 @@
-import React, { Children, FC, useState } from "react";
-import { usePagedScroller } from "./usePagedScroller";
-import { motion } from "framer-motion";
+import React, { Children, CSSProperties, FC } from "react";
+import { usePagedScroller } from "../../hooks/usePagedScroller";
 import { CellWrapper } from "../cellWrapper/cellWrapper";
 import { Button } from "../button/button";
 import { isTouchDevice } from "../../utils/isTouchDevice";
-import { styled } from "@stitches/react";
+import styles from "./pagedScroller.module.scss";
 
 type Props = {
   /** Width of the container as a string. Defaults to 100% (however, the max width is the width of all the items in the scroller). */
@@ -15,8 +14,6 @@ type Props = {
   showArrows?: boolean;
   /** Enables scrolling with drag gestures. Defaults to true on touch devices. */
   enableDrag?: boolean;
-  /** Enables scrolling past the edges elastically.  */
-  dragElastic?: boolean;
   /** Provide a custom button for scrolling left  */
   scrollLeftButton?: React.ReactElement;
   /** Provide a custom button for scrolling right  */
@@ -30,48 +27,39 @@ export const PagedScroller: FC<Props> = ({
   itemGap = 0,
   showArrows = !isTouchDevice(),
   enableDrag = isTouchDevice(),
-  dragElastic = true,
   scrollLeftButton,
   scrollRightButton,
   returnToStartButton,
   children,
 }) => {
   const {
-    x,
     visibleContainerRef,
     visibleContainerWidth,
     itemsContainerRef,
     itemsContainerWidth,
     atStart,
     atEnd,
+    dragging,
     updatePositionList,
     onLeftButtonClick,
     onRightButtonClick,
     onReturnToStartButtonClick,
-  } = usePagedScroller();
-
-  const [dragging, setDragging] = useState(false);
+  } = usePagedScroller(enableDrag);
 
   return (
-    <VisibleContainer
-      ref={visibleContainerRef}
-      css={{ width, maxWidth: itemsContainerWidth }}
+    <div
+      className={styles.wrapper}
+      style={
+        {
+          "--width": width,
+          "--itemsContainerWidth": `${itemsContainerWidth}px`,
+          "--itemGap": `${itemGap}px`,
+          "--overflow": enableDrag ? "auto" : "hidden",
+        } as CSSProperties
+      }
     >
-      <>
-        <ItemsContainer
-          ref={itemsContainerRef}
-          css={{ columnGap: itemGap }}
-          drag={enableDrag ? "x" : false}
-          dragConstraints={{
-            left: -itemsContainerWidth + visibleContainerWidth,
-            right: 0,
-          }}
-          _dragX={x}
-          style={{ x }}
-          dragElastic={!dragElastic ? false : undefined}
-          onDragStart={() => setDragging(true)}
-          onDragEnd={() => setDragging(false)}
-        >
+      <div ref={visibleContainerRef} className={styles.visibleContainer}>
+        <div ref={itemsContainerRef} className={styles.itemsContainer}>
           {Children.map(children, (child, index) => (
             <CellWrapper
               preventTaps={dragging}
@@ -82,8 +70,8 @@ export const PagedScroller: FC<Props> = ({
               {child}
             </CellWrapper>
           ))}
-        </ItemsContainer>
-      </>
+        </div>
+      </div>
       {showArrows && visibleContainerWidth !== itemsContainerWidth && (
         <>
           {!atStart && (
@@ -108,15 +96,6 @@ export const PagedScroller: FC<Props> = ({
           )}
         </>
       )}
-    </VisibleContainer>
+    </div>
   );
 };
-
-const VisibleContainer = styled("div", {
-  position: "relative",
-  overflow: "hidden",
-});
-
-const ItemsContainer = styled(motion.div, {
-  display: "inline-flex",
-});

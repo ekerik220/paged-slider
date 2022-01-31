@@ -1,6 +1,6 @@
-import useSize from "@react-hook/size";
 import React from "react";
 import { FC, useEffect, useRef } from "react";
+import { useSize } from "../../hooks/useSize";
 
 type Props = {
   preventTaps: boolean;
@@ -29,7 +29,10 @@ export const CellWrapper: FC<Props> = ({
   return (
     <div
       ref={containerRef}
-      style={{ pointerEvents: preventTaps ? "none" : undefined }}
+      style={{
+        pointerEvents: preventTaps ? "none" : undefined,
+        userSelect: "none",
+      }}
     >
       {children}
     </div>

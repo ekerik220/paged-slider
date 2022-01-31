@@ -9,10 +9,13 @@
     "module": "ESNext",
     "declaration": true,
     "declarationDir": "types",
+    "emitDeclarationOnly": true,
     "sourceMap": true,
     "outDir": "dist",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "emitDeclarationOnly": true
-  }
+    "removeComments": true,
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+  },
+  "include": ["src/lib/customModules.d.ts", "src/**/*"]
 }

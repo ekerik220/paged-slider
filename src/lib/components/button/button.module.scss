@@ -1,0 +1,33 @@
+%positioned {
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.leftPositioned {
+  @extend %positioned;
+  left: 10px;
+}
+
+.rightPositioned {
+  @extend %positioned;
+  right: 10px;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  border: 1px solid hsla(0, 0%, 100%, 0.7);
+  width: 40px;
+  height: 40px;
+  font-size: 30px;
+  background-color: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: "opacity 0.2s";
+}
+
+.button:hover {
+  opacity: 0.6;
+}

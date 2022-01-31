@@ -1,6 +1,6 @@
-import useSize from "@react-hook/size";
-import { useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useMouseScroll } from "./useMouseScroll";
+import { useSize } from "./useSize";
 
 type Position = {
   width: number;
@@ -9,7 +9,7 @@ type Position = {
   y: number;
 };
 
-export const usePagedScroller = () => {
+export const usePagedScroller = (enableDrag: boolean) => {
   const visibleContainerRef = useRef<HTMLDivElement>(null);
   const itemsContainerRef = useRef<HTMLDivElement>(null);
   const positionList = useRef<Position[]>([]);
@@ -18,27 +18,25 @@ export const usePagedScroller = () => {
   const [visibleContainerWidth] = useSize(visibleContainerRef);
   const [itemsContainerWidth] = useSize(itemsContainerRef);
 
-  const springDuration = 500;
-  const xSpring = useSpring(0, { duration: springDuration });
-  const x = useMotionValue(0);
-
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
 
+  const dragging = useMouseScroll(visibleContainerRef, enableDrag);
+
+  const updatePositionState = useCallback(() => {
+    const offset = visibleContainerRef.current?.scrollLeft ?? 0;
+    setAtStart(offset === 0);
+    setAtEnd(offset >= itemsContainerWidth - visibleContainerWidth);
+  }, [itemsContainerWidth, visibleContainerWidth]);
+
+  const scrollTo = (offset: number) =>
+    visibleContainerRef.current?.scrollTo({ left: offset, behavior: "smooth" });
+
   useEffect(() => {
-    const unsubscribeSpring = xSpring.onChange(() => x.set(xSpring.get()));
-    const unsubscribeX = x.onChange(() => {
-      xSpring.set(x.get(), false);
-      setAtStart(x.get() >= 0);
-      setAtEnd(
-        Math.abs(x.get()) >= itemsContainerWidth - visibleContainerWidth
-      );
-    });
-    return () => {
-      unsubscribeSpring();
-      unsubscribeX();
-    };
-  }, [xSpring, x, itemsContainerWidth, visibleContainerWidth]);
+    const container = visibleContainerRef.current;
+    container?.addEventListener("scroll", updatePositionState);
+    return () => container?.removeEventListener("scroll", updatePositionState);
+  }, [updatePositionState]);
 
   const updatePositionList = (
     index: number,
@@ -50,22 +48,14 @@ export const usePagedScroller = () => {
     positionList.current[index] = { width, height, x, y };
   };
 
-  const setScrollLock = () => {
-    scrollLock.current = true;
-    // Let go of the lock 100ms before animation finishes so user doesn't
-    // have to wait for the scroll to completely stop
-    setTimeout(() => (scrollLock.current = false), springDuration - 100);
-  };
-
   const onLeftButtonClick = () => {
-    if (scrollLock.current) return;
-    setScrollLock();
+    if (!visibleContainerRef.current) return;
+    const currentScrollLeft = visibleContainerRef.current.scrollLeft;
 
     // If there is an item partially visible on the left side, get it's index
     const straddledPositionIndex = positionList.current.findIndex(
       (item) =>
-        Math.abs(xSpring.get()) > item.x &&
-        Math.abs(xSpring.get()) < item.x + item.width
+        currentScrollLeft > item.x && currentScrollLeft < item.x + item.width
     );
 
     // If there was no staddled item, get the index of the item that comes before
@@ -76,7 +66,7 @@ export const usePagedScroller = () => {
     let visibleAfterScrollIndex = straddledPositionIndex;
     if (straddledPositionIndex === -1) {
       const firstVisibleItemIndex = positionList.current.findIndex(
-        (item) => item.x >= Math.abs(xSpring.get())
+        (item) => item.x >= currentScrollLeft
       );
       visibleAfterScrollIndex = Math.max(0, firstVisibleItemIndex - 1);
     }
@@ -101,17 +91,17 @@ export const usePagedScroller = () => {
         newPositionIndex = i;
       } else break;
     }
-    x.stop();
-    xSpring.set(-positionList.current[newPositionIndex].x);
+
+    scrollTo(positionList.current[newPositionIndex].x);
   };
 
   const onRightButtonClick = () => {
-    if (scrollLock.current) return;
-    setScrollLock();
+    if (!visibleContainerRef.current) return;
+    const currentScrollLeft = visibleContainerRef.current.scrollLeft;
 
     // Start by getting a naive after-scroll position by just moving the offset
     // over by the width of the visible box.
-    let proposedNewOffset = -xSpring.get() + visibleContainerWidth;
+    let proposedNewOffset = currentScrollLeft + visibleContainerWidth;
 
     // If the naive after-scroll position caused us to be straddling an item on the left side
     // of the visible box, it means we've not fully seen this item yet and need to adjust backwards
@@ -120,7 +110,6 @@ export const usePagedScroller = () => {
       (item) =>
         proposedNewOffset >= item.x && proposedNewOffset < item.x + item.width
     );
-
     if (straddledPosition) {
       proposedNewOffset = straddledPosition.x;
     }
@@ -130,24 +119,23 @@ export const usePagedScroller = () => {
       itemsContainerWidth - visibleContainerWidth,
       proposedNewOffset
     );
-    x.stop();
-    xSpring.set(-proposedNewOffset);
+
+    scrollTo(proposedNewOffset);
   };
 
   const onReturnToStartButtonClick = () => {
     if (scrollLock.current) return;
-    setScrollLock();
-    xSpring.set(0);
+    scrollTo(0);
   };
 
   return {
-    x,
     itemsContainerRef,
     itemsContainerWidth,
     visibleContainerRef,
     visibleContainerWidth,
     atStart,
     atEnd,
+    dragging,
     updatePositionList,
     onLeftButtonClick,
     onRightButtonClick,

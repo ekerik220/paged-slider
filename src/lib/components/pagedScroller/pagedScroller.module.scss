@@ -1,0 +1,21 @@
+.wrapper {
+  position: relative;
+  width: var(--width);
+  max-width: var(--itemsContainerWidth);
+}
+
+.visibleContainer {
+  overflow: var(--overflow);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.visibleContainer::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.itemsContainer {
+  display: inline-flex;
+  column-gap: var(--itemGap);
+}
