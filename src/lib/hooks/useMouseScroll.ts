@@ -35,6 +35,7 @@ export const useMouseScroll = (
   }, []);
 
   const addListeners = useCallback(() => {
+    if (typeof window === "undefined") return;
     const container = containerRef.current;
     if (!container) return;
     container.addEventListener("mousedown", handleMouseDown);
@@ -43,6 +44,7 @@ export const useMouseScroll = (
   }, [containerRef, handleMouseDown, handleMouseMove, handleMouseUp]);
 
   const removeListeners = useCallback(() => {
+    if (typeof window === "undefined") return;
     const container = containerRef.current;
     if (!container) return;
     container.removeEventListener("mousedown", handleMouseDown);
@@ -51,7 +53,6 @@ export const useMouseScroll = (
   }, [containerRef, handleMouseDown, handleMouseMove, handleMouseUp]);
 
   useEffect(() => {
-    if (!window) return;
     active ? addListeners() : removeListeners();
     return () => removeListeners();
   }, [active, addListeners, removeListeners]);
