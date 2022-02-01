@@ -9,7 +9,7 @@ type Props = {
   /** Width of the container as a string. Defaults to 100% (however, the max width is the width of all the items in the scroller). */
   width?: string;
   /** Gap between items in px */
-  itemGap?: number;
+  itemGap?: string;
   /** Shows the paged scrolling arrow buttons. Defaults to true on non-touch devices. */
   showArrows?: boolean;
   /** Enables scrolling with drag gestures. Defaults to true on touch devices. */
@@ -53,7 +53,7 @@ export const PagedScroller: FC<Props> = ({
         {
           "--width": width,
           "--itemsContainerWidth": `${itemsContainerWidth}px`,
-          "--itemGap": `${itemGap}px`,
+          "--itemGap": itemGap,
           "--overflow": enableDrag ? "auto" : "hidden",
         } as CSSProperties
       }

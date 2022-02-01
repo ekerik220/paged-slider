@@ -6,7 +6,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <PagedScroller width="100%">
+        <PagedScroller width="100%" itemGap="8px">
           {[...Array(20)].map((_, i) => (
             <Item key={i} index={i} />
           ))}

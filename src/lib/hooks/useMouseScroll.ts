@@ -51,6 +51,7 @@ export const useMouseScroll = (
   }, [containerRef, handleMouseDown, handleMouseMove, handleMouseUp]);
 
   useEffect(() => {
+    if (!window) return;
     active ? addListeners() : removeListeners();
     return () => removeListeners();
   }, [active, addListeners, removeListeners]);

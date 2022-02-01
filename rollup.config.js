@@ -9,6 +9,7 @@ import postcss from "rollup-plugin-postcss";
 import { terser } from "rollup-plugin-terser";
 import svgr from "@svgr/rollup";
 import url from "@rollup/plugin-url";
+import del from "rollup-plugin-delete";
 
 import pkg from "./package.json";
 
@@ -45,8 +46,11 @@ const config = [
   },
   {
     input: "dist/esm/types/index.d.ts",
-    output: [{ file: "dist/esm/index.d.ts", format: "esm" }],
-    plugins: [dts()],
+    output: [{ file: "dist/index.d.ts", format: "esm" }],
+    plugins: [
+      dts(),
+      del({ hook: "buildEnd", targets: ["dist/cjs/types", "dist/esm/types"] }),
+    ],
   },
 ];
 
