@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 declare type Props = {
     width?: string;
-    itemGap?: number;
+    itemGap?: string;
     showArrows?: boolean;
     enableDrag?: boolean;
     scrollLeftButton?: React.ReactElement;

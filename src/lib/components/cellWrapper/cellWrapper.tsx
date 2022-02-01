@@ -1,6 +1,7 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import { FC, useEffect, useRef } from "react";
 import { useSize } from "../../hooks/useSize";
+import styles from "./cellWrapper.module.scss";
 
 type Props = {
   preventTaps: boolean;
@@ -29,10 +30,12 @@ export const CellWrapper: FC<Props> = ({
   return (
     <div
       ref={containerRef}
-      style={{
-        pointerEvents: preventTaps ? "none" : undefined,
-        userSelect: "none",
-      }}
+      className={styles.cellWrapper}
+      style={
+        {
+          "--pointerEvents": preventTaps ? "none" : undefined,
+        } as CSSProperties
+      }
     >
       {children}
     </div>

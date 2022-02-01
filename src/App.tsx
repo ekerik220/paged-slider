@@ -6,7 +6,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <PagedScroller width="100%" itemGap="8px">
+        <PagedScroller width="100%" itemGap="8px" enableDrag={true}>
           {[...Array(20)].map((_, i) => (
             <Item key={i} index={i} />
           ))}
