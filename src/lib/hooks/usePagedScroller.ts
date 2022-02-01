@@ -75,21 +75,20 @@ export const usePagedScroller = (enableDrag: boolean) => {
     // after the scroll by moving backwards from the visibleAfterScrollIndex, accumulating
     // the sizes of the items until we overflow the visible box size.
     let newPositionIndex = visibleAfterScrollIndex;
+    const visibleAfterScrollPosition =
+      positionList.current[visibleAfterScrollIndex];
     for (let i = visibleAfterScrollIndex; i >= 0; i--) {
-      if (i === 0) {
-        newPositionIndex = 0;
-        break;
-      }
-      const straddledPosition = positionList.current[visibleAfterScrollIndex];
       const positionDiff = Math.abs(
-        straddledPosition.x +
-          straddledPosition.width -
+        visibleAfterScrollPosition.x +
+          visibleAfterScrollPosition.width -
           positionList.current[i].x
       );
 
       if (positionDiff <= visibleContainerWidth) {
         newPositionIndex = i;
       } else break;
+
+      if (i === 0) newPositionIndex = 0;
     }
 
     scrollTo(positionList.current[newPositionIndex].x);
@@ -106,12 +105,22 @@ export const usePagedScroller = (enableDrag: boolean) => {
     // If the naive after-scroll position caused us to be straddling an item on the left side
     // of the visible box, it means we've not fully seen this item yet and need to adjust backwards
     // a bit to line our offset up with the straddled item's left edge
-    const straddledPosition = positionList.current.find(
+    const straddledPositionIndex = positionList.current.findIndex(
       (item) =>
         proposedNewOffset >= item.x && proposedNewOffset < item.x + item.width
     );
-    if (straddledPosition) {
-      proposedNewOffset = straddledPosition.x;
+    if (straddledPositionIndex >= 0) {
+      proposedNewOffset = positionList.current[straddledPositionIndex].x;
+
+      // If the item is bigger than the viewport it will be straddling the proposed offset, and therefore
+      // we'll try to move back to the start of it, which will mean we can't move forward... if we detect
+      // this, just move to the next item (or the end of the scroll if the large item is the last item).
+      if (proposedNewOffset === currentScrollLeft) {
+        proposedNewOffset =
+          straddledPositionIndex + 1 < positionList.current.length
+            ? positionList.current[straddledPositionIndex + 1].x
+            : itemsContainerWidth - visibleContainerWidth;
+      }
     }
 
     // Prevent scrolling past the last item

@@ -8,7 +8,7 @@ export const Item: FC<Props> = ({ index }) => {
   return (
     <div
       style={{
-        width: "70px",
+        width: "700px",
         height: "100px",
         backgroundColor: "grey",
         overflow: "hidden",
