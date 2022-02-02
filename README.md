@@ -4,6 +4,8 @@
 
 A horizontal scrolling box component with no scroll bar. Scroll arrows can be optionally displayed, and clicking on them scrolls over one page (making sure that no items are skipped). It also optionally supports drag gestures that play nice with items that have onClick handlers.
 
+Zero dependencies and just 3kB gzipped.
+
 ## Installation
 
 ```
