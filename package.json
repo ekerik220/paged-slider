@@ -1,6 +1,6 @@
 {
   "name": "react-paged-scroller",
-  "version": "1.0.9",
+  "version": "2.0.0",
   "description": "A horizontal psuedo-scrolling (no scroll bar) box component.",
   "author": "Evan Kerik",
   "license": "MIT",

@@ -1,4 +1,4 @@
-import React, { Children, CSSProperties, FC } from "react";
+import React, { Children, CSSProperties, FC, useRef } from "react";
 import { usePagedScroller } from "../../hooks/usePagedScroller";
 import { CellWrapper } from "../cellWrapper/cellWrapper";
 import { Button } from "../button/button";
@@ -20,6 +20,8 @@ type Props = {
   scrollRightButton?: React.ReactElement;
   /** Provide a custom button for scrolling back to the start  */
   returnToStartButton?: React.ReactElement;
+  /** Provide a ref to the scroll component (to control the scroll position, for example) */
+  scrollContainerRef?: React.RefObject<HTMLDivElement>;
 };
 
 export const PagedScroller: FC<Props> = ({
@@ -30,12 +32,14 @@ export const PagedScroller: FC<Props> = ({
   scrollLeftButton,
   scrollRightButton,
   returnToStartButton,
+  scrollContainerRef,
   children,
 }) => {
+  const visibleContainerRef = useRef<HTMLDivElement>(null);
+  const itemsContainerRef = useRef<HTMLDivElement>(null);
+
   const {
-    visibleContainerRef,
     visibleContainerWidth,
-    itemsContainerRef,
     itemsContainerWidth,
     atStart,
     atEnd,
@@ -44,7 +48,11 @@ export const PagedScroller: FC<Props> = ({
     onLeftButtonClick,
     onRightButtonClick,
     onReturnToStartButtonClick,
-  } = usePagedScroller(enableDrag);
+  } = usePagedScroller(
+    scrollContainerRef ?? visibleContainerRef,
+    itemsContainerRef,
+    enableDrag
+  );
 
   return (
     <div
@@ -58,7 +66,10 @@ export const PagedScroller: FC<Props> = ({
         } as CSSProperties
       }
     >
-      <div ref={visibleContainerRef} className={styles.visibleContainer}>
+      <div
+        ref={scrollContainerRef ?? visibleContainerRef}
+        className={styles.visibleContainer}
+      >
         <div ref={itemsContainerRef} className={styles.itemsContainer}>
           {Children.map(children, (child, index) => (
             <CellWrapper

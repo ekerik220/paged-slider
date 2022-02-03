@@ -41,6 +41,7 @@ All props are optional.
 - `scrollLeftButton (ReactElement)`: Provide a custom button for scrolling left.
 - `scrollRightButton (ReactElement)`: Provide a custom button for scrolling right.
 - `returnToStartButton (ReactElement)`: Provide a custom button for scrolling back to the start.
+- `scrollContainerRef (React.RefObject)`: Provide a ref to the scroll component (to control the scroll position, for example)
 
 ## License
 

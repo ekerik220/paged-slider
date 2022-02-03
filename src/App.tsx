@@ -1,19 +1,31 @@
-import React, { Component } from "react";
-
+import React, { FC, useRef } from "react";
 import { Item } from "./item";
 import { PagedScroller } from "./lib/components/pagedScroller/pagedScroller";
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <PagedScroller width="100%" itemGap="8px" enableDrag={true}>
-          {[...Array(5)].map((_, i) => (
-            <Item key={i} index={i} />
-          ))}
-        </PagedScroller>
-      </div>
-    );
-  }
-}
+
+type Props = {};
+
+const App: FC<Props> = () => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const onClick = () => {
+    ref.current?.scrollTo({ left: 400, behavior: "smooth" });
+  };
+
+  return (
+    <div className="App">
+      <button onClick={onClick}>click</button>
+      <PagedScroller
+        width="100%"
+        itemGap="8px"
+        enableDrag={true}
+        scrollContainerRef={ref}
+      >
+        {[...Array(5)].map((_, i) => (
+          <Item key={i} index={i} />
+        ))}
+      </PagedScroller>
+    </div>
+  );
+};
 
 export default App;

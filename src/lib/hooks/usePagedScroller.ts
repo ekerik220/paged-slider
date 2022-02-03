@@ -9,9 +9,11 @@ type Position = {
   y: number;
 };
 
-export const usePagedScroller = (enableDrag: boolean) => {
-  const visibleContainerRef = useRef<HTMLDivElement>(null);
-  const itemsContainerRef = useRef<HTMLDivElement>(null);
+export const usePagedScroller = (
+  visibleContainerRef: React.RefObject<HTMLDivElement>,
+  itemsContainerRef: React.RefObject<HTMLDivElement>,
+  enableDrag: boolean
+) => {
   const positionList = useRef<Position[]>([]);
   const scrollLock = useRef(false);
 
@@ -27,7 +29,7 @@ export const usePagedScroller = (enableDrag: boolean) => {
     const offset = visibleContainerRef.current?.scrollLeft ?? 0;
     setAtStart(offset === 0);
     setAtEnd(offset >= itemsContainerWidth - visibleContainerWidth);
-  }, [itemsContainerWidth, visibleContainerWidth]);
+  }, [itemsContainerWidth, visibleContainerRef, visibleContainerWidth]);
 
   const scrollTo = (offset: number) =>
     visibleContainerRef.current?.scrollTo({ left: offset, behavior: "smooth" });
@@ -36,7 +38,7 @@ export const usePagedScroller = (enableDrag: boolean) => {
     const container = visibleContainerRef.current;
     container?.addEventListener("scroll", updatePositionState);
     return () => container?.removeEventListener("scroll", updatePositionState);
-  }, [updatePositionState]);
+  }, [updatePositionState, visibleContainerRef]);
 
   const updatePositionList = (
     index: number,
