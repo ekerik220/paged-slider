@@ -1,4 +1,5 @@
-![example](https://user-images.githubusercontent.com/5779535/151152606-5f4f7e64-e9db-491d-af25-bb393df50d26.gif)
+![buttons](https://user-images.githubusercontent.com/5779535/158298715-01c3c6eb-69ca-406f-ad75-dc9df0f67d0a.gif)
+![drag](https://user-images.githubusercontent.com/5779535/158298725-4611c4bb-e00c-4c39-9f38-0377be1258e1.gif)
 
 # react-paged-scroller
 
