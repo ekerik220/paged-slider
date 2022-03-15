@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 declare type Props = {
+    className?: string;
     width?: string;
     itemGap?: string;
     showArrows?: boolean;

@@ -1,6 +1,7 @@
 import React, { FC, useRef } from "react";
 import { Item } from "./item";
 import { PagedScroller } from "./lib/components/pagedScroller/pagedScroller";
+import styles from "./App.module.scss";
 
 type Props = {};
 
@@ -15,6 +16,7 @@ const App: FC<Props> = () => {
     <div className="App">
       <button onClick={onClick}>click</button>
       <PagedScroller
+        className={styles.testClass}
         width="100%"
         itemGap="8px"
         enableDrag={true}

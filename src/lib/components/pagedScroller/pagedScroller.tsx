@@ -6,6 +6,8 @@ import { isTouchDevice } from "../../utils/isTouchDevice";
 import styles from "./pagedScroller.module.scss";
 
 type Props = {
+  /** Gets passed along to component's className */
+  className?: string;
   /** Width of the container as a string. Defaults to 100% (however, the max width is the width of all the items in the scroller). */
   width?: string;
   /** Gap between items in px */
@@ -25,6 +27,7 @@ type Props = {
 };
 
 export const PagedScroller: FC<Props> = ({
+  className,
   width = "100%",
   itemGap = 0,
   showArrows = !isTouchDevice(),
@@ -56,7 +59,7 @@ export const PagedScroller: FC<Props> = ({
 
   return (
     <div
-      className={styles.wrapper}
+      className={`${styles.wrapper} ${className}`}
       style={
         {
           "--width": width,
