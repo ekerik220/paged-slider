@@ -32,6 +32,7 @@ yarn add react-paged-scroller
 
 All props are optional.
 
+- `className (string)`: Gets passed along to the component's className.
 - `width (string)`: Width of the container as a string. Defaults to 100% (however, the max width is the width of all the items in the scroller) (eg. "500px").
 - `itemGap (string)`: Gap between items (eg: "8px").
 - `showArrows (boolean)`: Shows the paged scrolling arrow buttons. Defaults to true on non-touch devices.
